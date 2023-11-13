@@ -1,0 +1,127 @@
+
+@font-face { font-family: OCRAEXT; src: url('src/Fonts/ocr-aregular.ttf'); }
+@font-face { font-family: powerhouse; src: url('src/Fonts/Powerhouse\ Medium.ttf'); }
+
+body {
+    background-color: #131313;
+    font-family: OCRAEXT;
+    font-size: 20px;
+    text-align: left;
+}
+
+h1 {
+    color: rgb(69, 69, 69);
+    text-align: center;
+}
+
+p {
+    font-family: OCRAEXT;
+    font-size: 20px;
+}
+
+nav {
+    background-color: #280b51;
+    font-size: 30px;
+}
+
+article {
+    background-color: #272727;
+    padding: 60px;
+    text-align: left;
+    border:#000000;
+    border-radius: 0%;
+    border-style: solid;
+    font-size: 40px;
+    font-family: powerhouse;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+
+article a {
+    display: block;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+article a:hover {
+    display: block;
+    color:#0028ad;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+article a:active {
+    display: block;
+    color:#003cff;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+article img {
+    display: block;
+    margin: 0 auto;
+}
+
+
+div {
+    text-align: center;
+}
+
+footer {
+    position:static;
+    top: 0;
+    width: 100%;
+    background-color: #280b51;
+    color: white;
+    text-align: center;
+}
+
+h1 {
+    font-family: OCRAEXT
+}
+
+button {
+    font-family: OCRAEXT;
+    background-color: lightblue  ;
+    font-style: italic;
+    padding: 0.2%;
+}
+
+a {
+    color: aqua;
+    
+}
+
+#etusivu {  
+    margin-left: 40px;
+    margin-top: 15px;
+    margin-bottom: -10px;
+    width: 120px;
+    height: 30px;   
+    background: navy;
+    color: white;   
+    font-size:14px;
+    font-weight:700;
+    border:#3b5657;
+    border-radius: 10%;
+    border-style: outset;
+}
+
+#etusivu:hover {
+    margin-left: 40px;
+    margin-top: 15px;
+    margin-bottom: -10px;
+    width: 120px;
+    height: 30px;   
+    background: navy;   
+    color: #00a7ad;   
+    font-size:14px;
+    font-weight:700;
+    border:#3b5657;
+    border-radius: 10%;
+    border-style: inset;
+}
+
+

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Miinaharava</title>
+  <style>
+    body {
+      background-color: #272727;
+    }
+    .board {
+      display: grid;
+      grid-template-columns: repeat(10, 30px);
+      grid-gap: 1px;
+    }
+    .cell {
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      background-color: #ccc;
+      border: 1px solid #999;
+      cursor: pointer;
+    }
+    .cell.revealed {
+      background-color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <a href="../../../index.html">Etusivu</a>
+  <div class="board" id="board"></div>
+  <script>
+    const board = document.getElementById('board');
+    const size = 10;
+    const mines = 20;
+    const cells = [];
+    const revealed = new Array(size * size).fill(false);
+    const mineLocations = generateMineLocations();
+    
+    function generateMineLocations() {
+      const locations = new Set();
+      while (locations.size < mines) {
+        const location = Math.floor(Math.random() * size * size);
+        locations.add(location);
+      }
+      return Array.from(locations);
+    }
+    
+    function createBoard() {
+      for (let i = 0; i < size; i++) {
+        for (let j = 0; j < size; j++) {
+          const cell = document.createElement('div');
+          cell.classList.add('cell');
+          cell.dataset.row = i;
+          cell.dataset.col = j;
+          cell.addEventListener('click', cellClick);
+          board.appendChild(cell);
+          cells.push(cell);
+        }
+      }
+    }
+    
+    function cellClick(event) {
+      const cell = event.target;
+      if (cell.classList.contains('revealed')) return;
+      const row = parseInt(cell.dataset.row);
+      const col = parseInt(cell.dataset.col);
+      const index = row * size + col;
+      if (mineLocations.includes(index)) {
+        // Räjäytä miina ja päätä peli
+        cell.classList.add('revealed');
+        cell.style.backgroundColor = 'red';
+        cell.textContent = 'X';
+        gameOver();
+      } else {
+        const minesAround = countMinesAround(row, col);
+        cell.classList.add('revealed');
+        revealed[index] = true;
+        cell.textContent = minesAround > 0 ? minesAround : '';
+        if (minesAround === 0) {
+          revealEmptyCells(row, col);
+        }
+        checkWin();
+      }
+    }
+    
+    function countMinesAround(row, col) {
+      let count = 0;
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          const newRow = row + i;
+          const newCol = col + j;
+          if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size) {
+            const index = newRow * size + newCol;
+            if (mineLocations.includes(index)) {
+              count++;
+            }
+          }
+        }
+      }
+      return count;
+    }
+    
+    function revealEmptyCells(row, col) {
+      for (let i = -1; i <= 1; i++) {
+        for (let j = -1; j <= 1; j++) {
+          const newRow = row + i;
+          const newCol = col + j;
+          if (newRow >= 0 && newRow < size && newCol >= 0 && newCol < size) {
+            const index = newRow * size + newCol;
+            if (!revealed[index]) {
+              const minesAround = countMinesAround(newRow, newCol);
+              cells[index].classList.add('revealed');
+              revealed[index] = true;
+              cell.textContent = minesAround > 0 ? minesAround : '';
+              if (minesAround === 0) {
+                revealEmptyCells(newRow, newCol);
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    function gameOver() {
+      // Implement game over logic here
+      alert('Peli päättyi! Yritä uudelleen.');
+    }
+    
+    function checkWin() {
+      if (revealed.filter(revealed => !revealed).length === size * size - mines) {
+        // Implement win logic here
+        alert('Onneksi olkoon, voitit pelin!');
+      }
+    }
+    
+    createBoard();
+  </script>
+</body>
+</html>

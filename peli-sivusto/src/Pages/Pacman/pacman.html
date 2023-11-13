@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #272727;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <a href="../../../index.html">Etusivu</a>
+    <canvas id="pacman" width="400" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById('pacman');
+        const ctx = canvas.getContext('2d');
+
+        // Kenttä
+        const wallColor = 'blue';
+        ctx.fillStyle = wallColor;
+        ctx.fillRect(50, 50, 300, 300);
+
+        // Pac-Man
+        const pacman = {
+            x: canvas.width / 2,
+            y: canvas.height / 2,
+            radius: 20,
+            mouthAngle: 1.2 * Math.PI,
+            mouthOpen: true,
+            speed: 2,
+            score: 0,
+            powerUpActive: false,
+            powerUpDuration: 60000, // 60 sekuntia
+            powerUpRemaining: 0,
+        };
+
+        // Haamu
+        const ghost = {
+            x: 100,
+            y: 100,
+            radius: 15,
+            speed: 2,
+            vulnerable: false,
+        };
+
+        // Power Up
+        const powerUp = {
+            x: 200,
+            y: 300,
+            radius: 10,
+            active: true,
+            respawnTime: 15000, // 15 sekuntia
+            respawnRemaining: 0,
+        };
+
+        // Ansa
+        const trap = {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+        };
+
+        // Pelin tila
+        let gameover = false;
+
+        document.addEventListener('keydown', movePacman);
+
+        function drawPacman() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (!gameover) {
+                // Kenttä
+                ctx.fillStyle = wallColor;
+                ctx.fillRect(50, 50, 300, 300);
+
+                // Lisää ansa ja Power Up satunnaisesti
+                if (trap.width === 0) {
+                    trap.width = Math.random() * 100 + 20;
+                    trap.height = Math.random() * 100 + 20;
+                    trap.x = Math.random() * (canvas.width - trap.width - 50) + 50;
+                    trap.y = Math.random() * (canvas.height - trap.height - 50) + 50;
+                }
+
+                if (powerUp.active) {
+                    ctx.fillStyle = 'green';
+                    ctx.beginPath();
+                    ctx.arc(powerUp.x, powerUp.y, powerUp.radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                    ctx.closePath();
+                }
+
+                // Ansa
+                ctx.fillStyle = 'black';
+                ctx.fillRect(trap.x, trap.y, trap.width, trap.height);
+
+                // Pac-Man
+                ctx.beginPath();
+                ctx.arc(pacman.x, pacman.y, pacman.radius, pacman.mouthAngle, pacman.mouthAngle + 1.6 * Math.PI);
+                ctx.lineTo(pacman.x, pacman.y);
+                ctx.fillStyle = 'yellow';
+                ctx.fill();
+                ctx.closePath();
+
+                if (pacman.mouthOpen) {
+                    pacman.mouthAngle += 0.1;
+                    if (pacman.mouthAngle >= 1.9 * Math.PI) {
+                        pacman.mouthOpen = false;
+                    }
+                } else {
+                    pacman.mouthAngle -= 0.1;
+                    if (pacman.mouthAngle <= 1.2 * Math.PI) {
+                        pacman.mouthOpen = true;
+                    }
+                }
+
+                // Haamu
+                ctx.fillStyle = ghost.vulnerable ? 'blue' : 'red';
+                ctx.beginPath();
+                ctx.arc(ghost.x, ghost.y, ghost.radius, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.closePath();
+
+                // Liikuta haamua
+                const dx = (Math.random() - 0.5) * ghost.speed;
+                const dy = (Math.random() - 0.5) * ghost.speed;
+                ghost.x += dx;
+                ghost.y += dy;
+
+                // Tarkista, osuiko Pac-Man haamuun
+                if (distance(pacman.x, pacman.y, ghost.x, ghost.y) < pacman.radius + ghost.radius) {
+                    if (!ghost.vulnerable) {
+                        if (pacman.powerUpActive) {
+                            // Haamu kuoli, palauta se kentän ulkopuolelle
+                            ghost.x = Math.random() * (canvas.width - 100) + 50;
+                            ghost.y = Math.random() * (canvas.height - 100) + 50;
+                            pacman.score += 10;
+                        } else {
+                            gameover = true;
+                        }
+                    } else {
+                        // Haamu kuoli, palauta se kentän ulkopuolelle
+                        ghost.x = Math.random() * (canvas.width - 100) + 50;
+                        ghost.y = Math.random() * (canvas.height - 100) + 50;
+                        pacman.score += 50;
+                    }
+                }
+
+                // Tarkista, osuiko Pac-Man ansaan
+                if (
+                    pacman.x + pacman.radius > trap.x &&
+                    pacman.x - pacman.radius < trap.x + trap.width &&
+                    pacman.y + pacman.radius > trap.y &&
+                    pacman.y - pacman.radius < trap.y + trap.height
+                ) {
+                    gameover = true;
+                }
+
+                // Tarkista, osuiko Pac-Man Power Upiin
+                if (
+                    powerUp.active &&
+                    distance(pacman.x, pacman.y, powerUp.x, powerUp.y) < pacman.radius + powerUp.radius
+                ) {
+                    pacman.powerUpActive = true;
+                    pacman.powerUpRemaining = pacman.powerUpDuration;
+                    powerUp.active = false;
+                    powerUp.respawnRemaining = powerUp.respawnTime;
+                }
+
+                // Vähennä Power Up -ajan jäljellä olevaa aikaa
+                if (pacman.powerUpRemaining > 0) {
+                    pacman.powerUpRemaining -= 16; // 16ms päivitysnopeudella
+                }
+
+                // Vähennä Power Upin uudelleen ilmestymiseen jäljellä olevaa aikaa
+                if (powerUp.respawnRemaining > 0) {
+                    powerUp.respawnRemaining -= 16; // 16ms päivitysnopeudella
+                }
+
+                // Uudelleen ilmestytä Power Up, kun aika on nollattu
+                if (powerUp.respawnRemaining <= 0 && !powerUp.active) {
+                    powerUp.active = true;
+                }
+
+                // Näytä pistemäärä ja Power Up -ajan jäljellä oleva aika
+                ctx.fillStyle = 'white';
+                ctx.font = '20px Arial';
+                ctx.fillText('Score: ' + pacman.score, 20, 30);
+                ctx.fillText('Power Up: ' + (pacman.powerUpRemaining / 1000).toFixed(1) + 's', canvas.width - 140, 30);
+            } else {
+                // Näytä pelin loppuviesti
+                ctx.fillStyle = 'white';
+                ctx.font = '30px Arial';
+                ctx.fillText('Game Over', canvas.width / 2 - 70, canvas.height / 2);
+                ctx.fillText('Press R to restart', canvas.width / 2 - 115, canvas.height / 2 + 40);
+            }
+
+            requestAnimationFrame(drawPacman);
+        }
+
+        function movePacman(event) {
+            if (!gameover) {
+                switch (event.key) {
+                    case 'ArrowUp':
+                        pacman.y -= pacman.speed;
+                        break;
+                    case 'ArrowDown':
+                        pacman.y += pacman.speed;
+                        break;
+                    case 'ArrowLeft':
+                        pacman.x -= pacman.speed;
+                        break;
+                    case 'ArrowRight':
+                        pacman.x += pacman.speed;
+                        break;
+                }
+            } else if (event.key === 'r' || event.key === 'R') {
+                restartGame();
+            }
+        }
+
+        function distance(x1, y1, x2, y2) {
+            return Math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2);
+        }
+
+        function restartGame() {
+            pacman.x = canvas.width / 2;
+            pacman.y = canvas.height / 2;
+            pacman.score = 0;
+            ghost.x = 100;
+            ghost.y = 100;
+            trap.width = 0;
+            trap.height = 0;
+            powerUp.respawnRemaining = powerUp.respawnTime;
+            gameover = false;
+            pacman.powerUpActive = false;
+            pacman.powerUpRemaining = 0;
+            ghost.vulnerable = false;
+        }
+
+        drawPacman();
+    </script>
+</body>
+</html>
