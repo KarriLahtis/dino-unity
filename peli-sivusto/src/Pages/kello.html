@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maailman Kellot</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #222222;
+    }
+    .clock {
+      display: inline-block;
+      margin: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      color: #ccc;
+      font-family: orca;
+    }
+  </style>
+</head>
+<body>
+
+<ul>
+<li>
+<div class="clock" id="clock-utc"></div>
+<div class="clock" id="clock-rome"></div>
+</li>
+<li><div class="clock" id="clock-oslo"></div>
+<div class="clock" id="clock-ny"></div>
+</li>
+<div class="clock" id="clock-stockholm"></div>
+<div class="clock" id="clock-tokyo"></div>
+</ul>
+
+<script>
+  function updateClock(timezone, elementId) {
+    const now = new Date();
+    const options = { timeZone: timezone, hour12: false, hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    const timeString = new Intl.DateTimeFormat('en-US', options).format(now);
+    document.getElementById(elementId).textContent = `${timezone}: ${timeString}`;
+  }
+
+  function updateWorldClock() {
+    updateClock('Europe/Helsinki', 'clock-utc');
+    updateClock('Europe/Rome', 'clock-rome');
+    updateClock('Europe/Oslo', 'clock-oslo');
+    updateClock('America/New_York', 'clock-ny');
+    updateClock('Europe/Stockholm', 'clock-stockholm');
+    updateClock('Asia/Tokyo', 'clock-tokyo');
+  }
+
+  setInterval(updateWorldClock, 1000);
+
+  updateWorldClock();
+</script>
+
+</body>
+</html>
