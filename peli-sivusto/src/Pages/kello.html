@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maailman Kellot</title>
+  <title>MAHTIMUKULAPELIT - Kello</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -18,15 +18,28 @@
       border-radius: 5px;
       color: #ccc;
       font-family: orca;
+      font-size: larger;
     }
+
+    h1 {
+      font-family: orca;
+      color: #ccc;
+    }
+
+    #etusivu {
+            color: aqua;
+            font-size: 24px;
+            font-family: orca;
+        }
   </style>
 </head>
 <body>
-
+<h1> Maailmankello (24H)</h1>
+<a id="etusivu" href="../../src/Pages/lisäohjelmat.html">Etusivu</a>
 <ul>
 <li>
 <div class="clock" id="clock-utc"></div>
-<div class="clock" id="clock-rome"></div>
+<div class="clock" id="clock-paris"></div>
 </li>
 <li><div class="clock" id="clock-oslo"></div>
 <div class="clock" id="clock-ny"></div>
@@ -34,7 +47,6 @@
 <div class="clock" id="clock-stockholm"></div>
 <div class="clock" id="clock-tokyo"></div>
 </ul>
-
 <script>
   function updateClock(timezone, elementId) {
     const now = new Date();
@@ -45,7 +57,7 @@
 
   function updateWorldClock() {
     updateClock('Europe/Helsinki', 'clock-utc');
-    updateClock('Europe/Rome', 'clock-rome');
+    updateClock('Europe/Paris', 'clock-paris');
     updateClock('Europe/Oslo', 'clock-oslo');
     updateClock('America/New_York', 'clock-ny');
     updateClock('Europe/Stockholm', 'clock-stockholm');
