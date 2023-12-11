@@ -1,25 +1,49 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Turun sää</title>
     <style>
-        .forecast {
-            color: rgb(0, 153, 255);
-            font-size: larger;
-        }
-        body{ 
-            background-color: rgb(49, 49, 49);
+        body {
+            font-family: Arial, sans-serif;
             text-align: center;
+            margin: 20px;
         }
     </style>
 </head>
 <body>
-    <div class="forecast">
-        <div class="city"><h1>Turku - Suomi</h1></div>
-        <div class="temp"><h2>-12°C</h2></div>
-        <div class="date"><h2>Maanantaina 04.12.2023</h2></div>
-        <div class="time"><h2>Kello 12:00</h2></div>  
+
+    <h1>Turun sää</h1>
+    
+    <div id="weather-container">
+        <p id="temperature"></p>
+        <p id="description"></p>
+    </div>
+
+    <script>
+        // Lisää oma API-avain tähän
+        const apiKey = 'TÄHÄN_OMA_API-AVAIMESI';
+
+        // Turun kaupungin koordinaatit
+        const latitude = 60.4518;
+        const longitude = 22.2666;
+
+        // Muodosta API-pyyntö
+        const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${apiKey}&units=metric`;
+
+        // Tee API-pyyntö ja päivitä sää tietojen mukaan
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const temperature = data.main.temp;
+                const description = data.weather[0].description;
+
+                document.getElementById('temperature').innerText = `Lämpötila: ${temperature} °C`;
+                document.getElementById('description').innerText = `Kuvaus: ${description}`;
+            })
+            .catch(error => console.error('Virhe haettaessa säätietoja:', error));
+    </script>
+
 </body>
 </html>
